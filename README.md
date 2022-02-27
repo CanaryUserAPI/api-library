@@ -1,1 +1,1 @@
-These are modules that were made by canary to make coding easier.
+Download these RBXM files and drag them from your file explorer (finder) into roblox studio
