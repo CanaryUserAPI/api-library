@@ -27,16 +27,22 @@ local module = {}
 local ButtonTemplate = script.ButtonTemplate
 local TopbarIcons = Instance.new("ScreenGui")
 local Player = game.Players.LocalPlayer
+
+if not Player then
+
+	error("UIShelf could not start due to not being local")
+
+end
+
 TopbarIcons.Name = "TopbarIcons"
 TopbarIcons.Parent = Player:WaitForChild("PlayerGui")
 TopbarIcons.IgnoreGuiInset = true
-TopbarIcons.DisplayOrder = 999999999
 
-function module:CreateButton(Name, Icon, ChatOffset, ChatDisabledOffset)
+function module:CreateButton(Name : string, IconId : number, ChatOffset : number, ChatDisabledOffset : number)
 	
 	local TopbarIcon = ButtonTemplate:Clone()
 	TopbarIcon.Parent = TopbarIcons
-	TopbarIcon.IconId.Value = Icon -- The image on your icon
+	TopbarIcon.IconId.Value = IconId -- The image on your icon
 	TopbarIcon.IconName.Value = Name -- The way your icon can be found
 	TopbarIcon.ChatOffset.Value = ChatOffset -- The default chat offset is 44, set to 0 if chat is disabled
 	TopbarIcon.ChatDisabledOffset.Value = ChatDisabledOffset
@@ -44,21 +50,63 @@ function module:CreateButton(Name, Icon, ChatOffset, ChatDisabledOffset)
 	
 end
 
-function module:UIServiceInitiate(TopbarEnabled) -- For canary client, should not be used outside of it.
+function module.OnMouse1Click(ButtonName : string, callbackFunction : any)
 	
-	if TopbarEnabled == true then
-		
-		local TopbarUI = Player:WaitForChild("PlayerGui"):WaitForChild("TopbarIcons")
-		
-		TopbarUI.Enabled = true
-		
-	else
-		
-		local TopbarUI = Player:WaitForChild("PlayerGui"):WaitForChild("TopbarIcons")
+	TopbarIcons:WaitForChild(ButtonName).MouseButton1Up:Connect(callbackFunction)
+	
+end
 
-		TopbarUI.Enabled = false
-		
-	end
+function module.Hovered(ButtonName : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName).MouseEnter:Connect(callbackFunction)
+	
+end
+
+function module.OnRemoved(ButtonName : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName).Destroying:Connect(callbackFunction)
+	
+end
+
+function module.HoverEnded(ButtonName : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName).MouseLeave:Connect(callbackFunction)
+	
+end
+
+function module.OnMouseMoved(ButtonName : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName).MouseMoved:Connect(callbackFunction)
+	
+end
+
+function module.OnMouse2Click(ButtonName : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName).MouseButton2Up:Connect(callbackFunction)
+	
+end
+
+function module:HideTopbar(Enabled : boolean)
+	
+	TopbarIcons.Enabled = Enabled
+	
+end
+
+function module.OnTopbarDisabled(callbackFunction : any)
+	
+	TopbarIcons:GetPropertyChangedSignal("Enabled"):Connect(callbackFunction)
+	
+end
+
+function module.OnTopbarEnabled(callbackFunction : any)
+	
+	TopbarIcons:GetPropertyChangedSignal("Enabled"):Connect(callbackFunction)
+	
+end
+
+function module.OnButtonPropertyChanged(ButtonName : string, Property : string, callbackFunction : any)
+	
+	TopbarIcons:WaitForChild(ButtonName):GetPropertyChangedSignal(Property):Connect(callbackFunction)
 	
 end
 
